@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>RoadToMMA</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -59,10 +59,10 @@ main{padding:20px;overflow-y:auto;}
 .mt{font-family:var(--ff);font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:18px;}
 .fr{margin-bottom:13px;}
 .fl{font-size:11px;color:var(--muted);font-family:var(--fm);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:block;}
-.fi{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);color:var(--text);font-family:var(--fb);font-size:14px;padding:9px 12px;outline:none;transition:border-color .15s;}
+.fi{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);color:var(--text);font-family:var(--fb);font-size:16px;padding:9px 12px;outline:none;transition:border-color .15s;}
 .fi:focus{border-color:var(--accent);}
 select.fi option{background:var(--surface);}
-textarea.fi{resize:vertical;min-height:70px;}
+textarea.fi{resize:vertical;min-height:70px;font-size:16px;}
 .fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .ma{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
 
@@ -117,7 +117,7 @@ textarea.fi{resize:vertical;min-height:70px;}
 .coach-bubble.user{background:rgba(200,240,96,.08);border:1px solid rgba(200,240,96,.15);align-self:flex-end;border-bottom-right-radius:3px;text-align:right;}
 .chat-wrap{display:flex;flex-direction:column;gap:6px;padding:16px;overflow-y:auto;height:calc(100vh - 300px);min-height:300px;}
 .chat-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:var(--surface);}
-.chat-input{flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);color:var(--text);font-family:var(--fb);font-size:13px;padding:9px 12px;outline:none;resize:none;max-height:120px;}
+.chat-input{flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);color:var(--text);font-family:var(--fb);font-size:16px;padding:9px 12px;outline:none;resize:none;max-height:120px;}
 .chat-input:focus{border-color:var(--teal);}
 .chat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);display:flex;flex-direction:column;overflow:hidden;}
 .typing-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--muted);animation:blink 1s ease-in-out infinite;margin:0 2px;}
@@ -480,7 +480,13 @@ function obAppend(text, isUser=false) {
 
 function obSetChips(chips) {
   const row = document.getElementById('ob-chips');
-  row.innerHTML = chips.map(c => `<button class="chip" onclick="obChip('${c.replace(/'/g,"\\'")}'')">${c}</button>`).join('');
+  row.innerHTML = chips.map((c,i) => `<button class="chip" data-chip="${i}">${c}</button>`).join('');
+  row.querySelectorAll('[data-chip]').forEach((btn,i) => {
+    btn.addEventListener('click', () => {
+      document.getElementById('ob-input').value = chips[i];
+      obSend();
+    });
+  });
 }
 
 function obChip(text) {
@@ -1122,14 +1128,14 @@ function renderCoach() {
 const COACH_CHIPS = ['Devolución de sesión','Problema técnico','Me cansé rápido','El sparring no salió','Cómo mejorar el clinch','Qué comer post-entreno','Armar plan semanal'];
 
 function renderCoachChips() {
-  document.getElementById('coach-chips-row').innerHTML = COACH_CHIPS.map(c=>
-    `<button class="chip" onclick="setCoachChip('${c.replace(/'/g,"\\'")}')">${c}</button>`
-  ).join('');
-}
-
-function setCoachChip(text) {
-  document.getElementById('coach-input').value = text;
-  document.getElementById('coach-input').focus();
+  const row = document.getElementById('coach-chips-row');
+  row.innerHTML = COACH_CHIPS.map((c,i) => `<button class="chip" data-idx="${i}">${c}</button>`).join('');
+  row.querySelectorAll('[data-idx]').forEach((btn,i) => {
+    btn.addEventListener('click', () => {
+      document.getElementById('coach-input').value = COACH_CHIPS[i];
+      document.getElementById('coach-input').focus();
+    });
+  });
 }
 
 function appendCoachBubble(text, isUser, scroll=true) {
